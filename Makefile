@@ -1,73 +1,110 @@
-# Compiler and Flags
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -I. -I$(LIBFTDIR) 
-
-# Libft
-LIBFTDIR = ./libft_v1
-
-
-# Sources
-M_SRC = \
-	main.c \
-	parcing/tokenizer.c \
-	parcing/parse.c \
-	parcing/expand.c \
-	parcing/utils.c \
-	parcing/syntax.c \
-	execution/mini_pars.c \
-	execution/builtins/echo.c \
-	execution/builtins/exit.c \
-	execution/external_cmd/external_cmd.c \
-	execution/external_cmd/help_func2/fond_cmd.c \
-	execution/external_cmd/help_func2/get_path_variable.c \
-	execution/execution.c \
-	execution/builtins/pwd.c \
-	execution/builtins/unset.c \
-	execution/help_func/check_cmd.c \
-	execution/help_func/get_cpy_of_env.c \
-	execution/help_func/sort_arr.c \
-	execution/help_func/get_value_and_key.c \
-	execution/help_func/print_expo.c \
-	execution/help_func/get_clean_key.c \
-	execution/help_func/set_data.c \
-	execution/help_func/check_builtins_cmd.c \
-	execution/help_func/valid_key.c \
-	execution/help_func/get_env.c \
-	execution/builtins/env.c \
-	execution/builtins/cd.c \
-	execution/builtins/export.c \
-
-# Objects
-M_OBJ = $(M_SRC:.c=.o)
-
-# Binary name
 NAME = minishell
+LIBFT_DIR = libft
+LIBFT = $(LIBFT_DIR)/libft.a
+CFLAGS = -Wall -Werror -Wextra -Iincludes
 
-# Clean
-DELETE = rm -f
+SRC_FILES = minishell.c \
+			parsing/parsing.c \
+			parsing/lexer/tokens.c \
+			parsing/lexer/lexer_core.c \
+			parsing/lexer/lexer_init.c \
+			parsing/lexer/handle_unquoted_word.c \
+			parsing/lexer/lexer_utils.c \
+			parsing/parser/parser_helpers.c \
+			parsing/parser/parser_core.c \
+			parsing/parser/parser_init.c \
+			parsing/parser/grammar.c \
+			parsing/lexer/lexer.c \
+			parsing/lexer/expantion/expander.c \
+			parsing/lexer/expantion/expander_utils.c \
+			parsing/lexer/heredoc/heredoc.c \
+			parsing/lexer/heredoc/heredoc_utils.c \
+			parsing/lexer/heredoc/heredoc_expantion.c \
+			execution/executor.c \
+			execution/pipe_helper/exe_first.c \
+			execution/pipe_helper/exe_last_cmd.c \
+			execution/pipe_helper/exe_middle.c \
+			execution/pipe_helper/set_end.c \
+			execution/pipe.c \
+			execution/redir_for_single.c \
+			execution/redir_for_multi.c \
+			execution/help_sredir/redir_append.c \
+			execution/help_sredir/redir_herdoc.c \
+			execution/help_sredir/redir_infile.c \
+			execution/help_sredir/redir_outfile.c \
+			execution/help_sredir/show_ambigu.c \
+			execution/help_mredir/show_amb2.c \
+			execution/help_mredir/redir_append2.c \
+			execution/help_mredir/redir_herdoc2.c \
+			execution/help_mredir/redir_infile2.c \
+			execution/help_mredir/redir_outfile2.c \
+			lib/data_structures/dynamic_array.c \
+			lib/data_structures/dynamic_string.c \
+			lib/data_structures/linked_list.c \
+			lib/data_structures/linked_list_2.c \
+			lib/builtins/env.c \
+			lib/builtins/echo.c \
+			lib/builtins/export.c \
+			lib/builtins/cd.c \
+			lib/builtins/pwd.c \
+			lib/builtins/unset.c \
+			lib/builtins/exit.c \
+			lib/utils/help_for_exe2.c/cmd_is_dir.c \
+			lib/utils/help_for_exe2.c/check_if_dir.c \
+			lib/utils/help_for_exe2.c/cmd_is_exe.c \
+			lib/utils/help_for_exe2.c/exe_cmd.c \
+			lib/utils/help_for_exe2.c/is_dir2.c \
+			lib/utils/help_for_exe2.c/put_error.c \
+			lib/utils/gc.c \
+			lib/utils/execute_cmd2.c \
+			lib/help_fun/print_expo.c \
+			lib/help_fun/check_overflow.c \
+			lib/help_fun/get_clean_key.c \
+			lib/help_fun/get_cpy_of_env.c \
+			lib/help_fun/get_value_and_key.c \
+			lib/help_fun/sort_arr.c \
+			lib/help_fun/valid_key.c \
+			lib/help_fun/ch_in_env.c \
+			lib/extra_cmd/extra_command.c \
+			lib/extra_cmd/help_func2/fond_cmd.c \
+			lib/extra_cmd/help_func2/cmd_is_dir.c \
+			lib/extra_cmd/help_func2/is_executable.c \
+			lib/extra_cmd/help_func2/path_is_set.c \
+			lib/extra_cmd/help_func2/valid_path.c \
+			lib/extra_cmd/help_func2/wait_process.c \
+			lib/extra_cmd/help_func2/is_directory.c \
+			lib/extra_cmd/help_func2/get_path_variable.c \
+			lib/bootstrap/init.c \
+			lib/bootstrap/env_load.c 
 
-# Default rule
-all: $(NAME)
+include libft_src.mk
 
-# Linking
-$(NAME): $(M_OBJ)
-	$(MAKE) -C $(LIBFTDIR)
-	$(MAKE) bonus -C $(LIBFTDIR)
-	$(CC) $(CFLAGS) $(M_OBJ) $(LIBFTDIR)/libft.a -lreadline -o $(NAME)
+OBJ_FILES = $(SRC_FILES:.c=.o)
 
-# Compile each .c to .o
+all: $(LIBFT) $(NAME)
+
+$(NAME): $(OBJ_FILES) 
+	$(CC) $(OBJ_FILES) $(LIBFT) -o $(NAME) $(CFLAGS) -L/usr/local/lib -lreadline -lhistory
+
+$(LIBFT): $(LIBFT_OFILES)
+	make -C $(LIBFT_DIR)
+
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Clean object files
 clean:
-	$(MAKE) clean -C $(LIBFTDIR)
-	$(DELETE) $(M_OBJ)
+	rm -f $(OBJ_FILES)
+	make -C $(LIBFT_DIR) clean
 
-# Clean all
 fclean: clean
-	$(MAKE) fclean -C $(LIBFTDIR)
-	$(DELETE) $(NAME)
+	rm -f $(NAME)
+	make -C $(LIBFT_DIR) fclean
 
-# Rebuild
 re: fclean all
+
+run: all
+	./$(NAME)
+
+.PHONY: all clean fclean re run
+.SECONDARY: $(OBJ_FILES) $(LIBFT_OFILES)
